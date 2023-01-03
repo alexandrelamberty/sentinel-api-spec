@@ -6,4 +6,6 @@
 IoT API specification for the
 [Sentinel ESP8266](https://github.com/alexandrelamberty/sentinel-esp8266) project.
 
+> This will be deprecated and replaced with a messaging system using MQTT.
+
 See the [documentation](https://alexandrelamberty.github.io/sentinel-api-spec/).
