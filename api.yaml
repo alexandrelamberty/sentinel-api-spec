@@ -1,7 +1,8 @@
-openapi: 3.0.2
+openapi: 3.1.0
 info:
   title: Sentinel
-  description: Home Automation and Monitoring IoT
+  summary: Summary about the api
+  description: Home Automation and Monitoring IoT Management
   contact:
     name: Alexandre Lamberty
     url: alexandrelamberty.com
@@ -11,46 +12,77 @@ info:
     url: "https://opensource.org/licenses/MIT"
   version: 0.0.1
 servers:
-  - url: "https://development.api.192.168.1.50"
-    description: Development server
-  - url: "https://staging.api.192.168.1.50"
-    description: Staging server
-  - url: "https://api.192.168.1.50"
+  - url: "http://192.168.1.41"
     description: Production server
 paths:
   /info:
     get:
-      summary: Retrieve device informations
-      tags:
-        - device
+      summary: Return Device Details
       responses:
         "200":
-          description: Device informations
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Device"
+          $ref: "#/components/responses/GetInfoSuccess"
       operationId: getDeviceInfo
-      description: Return information about the device
+      description: Return details about the device
+  /settings:
+    get:
+      summary: Retrieve the Device Settings
+      responses:
+        "200":
+          $ref: "#/components/responses/GetSettingsSuccess"
+      operationId: get-settings
+      description: Retrieve the device settings
+  /locate:
+    get:
+      summary: Locate a device
+      tags: []
+      responses: {}
+      operationId: get-locate
+      description: Locate the device by blinking it's led
+  /unpair:
+    get:
+      summary: Un pair a device
+      tags: []
+      responses: {}
+      operationId: get-unpair
+      description: Unpair and restart the device. This will change the device settings but keep the WiFi configuration. The device will restart and execute is 'pairing' process.
+  /reset:
+    get:
+      summary: Reset the device
+      tags: []
+      responses: {}
+      operationId: get-reset
+      description: "Reset and restart the device. This will remove all settings. The device will restart in Access Point mode, waiting to be configured."
 components:
   schemas:
     Device:
       type: object
       title: Device
+      x-stoplight:
+        id: zrp5k0u7el54q
       description: The informations about this device
       properties:
         name:
           type: string
-        info:
-          $ref: "#/components/schemas/Info"
+        mac:
+          type: string
+        ip:
+          type: string
         capabilities:
           type: array
           items:
             $ref: "#/components/schemas/Capability"
+        board:
+          $ref: "#/components/schemas/Board"
+        zone:
+          type: string
+        rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/Rule"
       required:
         - name
         - capabilities
-        - info
+        - board
     Capability:
       title: Capability
       type: object
@@ -86,8 +118,28 @@ components:
         model:
           type: string
           example: BMP180
-    Info:
+    Settings:
+      title: Settings
+      x-stoplight:
+        id: 2nqijuia9yzp1
+      type: object
+      properties:
+        id:
+          type: string
+        broker_uri:
+          type: string
+        broker_port:
+          type: string
+        api_url:
+          type: string
+        api_token:
+          type: string
+        device_standby:
+          type: string
+    Board:
       title: DeviceInfo
+      x-stoplight:
+        id: bs8qfryhcdg8q
       type: object
       properties:
         micro_controller:
@@ -96,6 +148,40 @@ components:
         board:
           type: string
           example: NodeMCU Amica v2 ESP8266 ESP-12F
-tags:
-  - name: device
-    description: Device informations endpoint
+    Rule:
+      title: Rule
+      x-stoplight:
+        id: hfpuxdv5h7bvx
+      type: object
+      properties:
+        id:
+          type: string
+      description: ""
+  requestBodies:
+    UpdateSettings:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              api_url:
+                type: string
+              api_token:
+                type: string
+            required:
+              - api_url
+              - api_token
+      description: Update settings request
+  responses:
+    GetSettingsSuccess:
+      description: Update settings success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Settings"
+    GetInfoSuccess:
+      description: Show device information success response
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Device"
