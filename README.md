@@ -8,4 +8,4 @@ IoT API specification for the
 
 > This will be deprecated and replaced with a messaging system using MQTT.
 
-See the [documentation](https://open-nidus.github.io/sentinel-api-spec/).
+See the [documentation](https://alexandrelamberty.github.io/sentinel-api-spec/).
